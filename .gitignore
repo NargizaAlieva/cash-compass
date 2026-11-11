@@ -1,0 +1,13 @@
+# Python
+server/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secrets and local data
+.env
+*.db
+
+# IDE
+.idea/
+.vscode/
