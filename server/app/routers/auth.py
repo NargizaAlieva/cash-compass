@@ -13,6 +13,7 @@ from app.schemas.user import (
     UserOut,
     UserUpdate,
 )
+from app.services.default_categories import create_default_categories
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -25,8 +26,9 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
 
     user = User(email=email, name=data.name, password_hash=hash_password(data.password))
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    db.flush()  # sends the INSERT so user.id is known, but does not commit yet
+    create_default_categories(db, user.id)
+    db.commit()  # user and categories are saved together
     return TokenResponse(access_token=create_access_token(user.id))
 
 
