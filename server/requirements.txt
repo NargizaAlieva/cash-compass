@@ -1,4 +1,9 @@
 fastapi
 uvicorn[standard]
+sqlalchemy
+pydantic-settings
+email-validator
+pyjwt
+bcrypt
 pytest
 httpx
