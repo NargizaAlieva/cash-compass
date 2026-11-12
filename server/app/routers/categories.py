@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.models.category import Category
+from app.models.transaction import Transaction
 from app.models.user import User
 from app.schemas.category import CategoryCreate, CategoryKind, CategoryOut, CategoryUpdate
 
@@ -84,5 +85,12 @@ def delete_category(
     db: Session = Depends(get_db),
 ):
     category = get_own_category(category_id, current_user, db)
+    used = db.scalar(
+        select(Transaction.id).where(Transaction.category_id == category.id).limit(1)
+    )
+    if used is not None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Category is used by transactions. Delete them first."
+        )
     db.delete(category)
     db.commit()
