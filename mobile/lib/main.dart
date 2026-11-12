@@ -6,6 +6,7 @@ import 'package:cash_compass/features/auth/data/auth_repository.dart';
 import 'package:cash_compass/features/categories/data/categories_repository.dart';
 import 'package:cash_compass/features/transactions/data/transactions_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,7 @@ void main() {
       accountsRepository: AccountsRepository(apiClient),
       categoriesRepository: CategoriesRepository(apiClient),
       transactionsRepository: TransactionsRepository(apiClient),
+      budgetsRepository: BudgetsRepository(apiClient),
     ),
   );
 }

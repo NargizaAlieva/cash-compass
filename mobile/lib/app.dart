@@ -7,6 +7,7 @@ import 'package:cash_compass/features/shell/main_shell.dart';
 import 'package:cash_compass/features/transactions/data/transactions_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
 
 const _seedColor = Color(0xFF0F766E);
 
@@ -17,12 +18,14 @@ class CashCompassApp extends StatelessWidget {
     required this.accountsRepository,
     required this.categoriesRepository,
     required this.transactionsRepository,
+    required this.budgetsRepository,
   });
 
   final AuthRepository authRepository;
   final AccountsRepository accountsRepository;
   final CategoriesRepository categoriesRepository;
   final TransactionsRepository transactionsRepository;
+  final BudgetsRepository budgetsRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +35,7 @@ class CashCompassApp extends StatelessWidget {
         RepositoryProvider.value(value: accountsRepository),
         RepositoryProvider.value(value: categoriesRepository),
         RepositoryProvider.value(value: transactionsRepository),
+        RepositoryProvider.value(value: budgetsRepository),
       ],
       child: BlocProvider(
         create: (_) => AuthBloc(authRepository)..add(const AuthStarted()),

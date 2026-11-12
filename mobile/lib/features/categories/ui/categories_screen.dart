@@ -1,6 +1,10 @@
 import 'package:cash_compass/core/ui/category_style.dart';
 import 'package:cash_compass/core/ui/confirm_dialog.dart';
 import 'package:cash_compass/core/ui/error_view.dart';
+import 'package:cash_compass/features/budgets/bloc/budgets_bloc.dart';
+import 'package:cash_compass/features/budgets/data/budget.dart';
+import 'package:cash_compass/features/budgets/ui/budget_progress.dart';
+import 'package:cash_compass/features/budgets/ui/limit_dialog.dart';
 import 'package:cash_compass/features/categories/bloc/categories_bloc.dart';
 import 'package:cash_compass/features/categories/data/category.dart';
 import 'package:cash_compass/features/categories/ui/category_form_dialog.dart';
@@ -108,22 +112,27 @@ class _CategoryList extends StatelessWidget {
   }
 }
 
-enum _CategoryAction { edit, delete }
+enum _CategoryAction { edit, setLimit, removeLimit, delete }
 
 class _CategoryTile extends StatelessWidget {
   const _CategoryTile({required this.category});
 
   final Category category;
 
-  Future<void> _onAction(BuildContext context, _CategoryAction action) async {
-    final bloc = context.read<CategoriesBloc>();
+  Future<void> _onAction(
+    BuildContext context,
+    _CategoryAction action,
+    BudgetStatus? budget,
+  ) async {
+    final categoriesBloc = context.read<CategoriesBloc>();
+    final budgetsBloc = context.read<BudgetsBloc>();
 
     switch (action) {
       case _CategoryAction.edit:
         final result =
             await showCategoryFormDialog(context, category: category);
         if (result != null) {
-          bloc.add(
+          categoriesBloc.add(
             CategoryUpdated(
               id: category.id,
               name: result.name,
@@ -132,6 +141,19 @@ class _CategoryTile extends StatelessWidget {
             ),
           );
         }
+      case _CategoryAction.setLimit:
+        final amount = await showLimitDialog(
+          context,
+          categoryName: category.name,
+          currentLimit: budget?.limitAmount,
+        );
+        if (amount != null) {
+          budgetsBloc.add(
+            BudgetLimitSet(categoryId: category.id, amount: amount),
+          );
+        }
+      case _CategoryAction.removeLimit:
+        budgetsBloc.add(BudgetLimitRemoved(category.id));
       case _CategoryAction.delete:
         final confirmed = await showConfirmDialog(
           context,
@@ -139,7 +161,7 @@ class _CategoryTile extends StatelessWidget {
           message: '"${category.name}" will be deleted.',
         );
         if (confirmed) {
-          bloc.add(CategoryDeleted(category.id));
+          categoriesBloc.add(CategoryDeleted(category.id));
         }
     }
   }
@@ -147,6 +169,12 @@ class _CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = colorFromHex(category.color);
+    final isExpense = category.kind == CategoryKind.expense;
+    // Limits exist only for expense categories
+    final budget = context.select(
+      (BudgetsBloc bloc) =>
+          isExpense ? bloc.state.forCategory(category.id) : null,
+    );
 
     return ListTile(
       leading: CircleAvatar(
@@ -154,11 +182,25 @@ class _CategoryTile extends StatelessWidget {
         child: Icon(iconFromName(category.icon), color: color),
       ),
       title: Text(category.name),
+      subtitle: budget == null ? null : BudgetProgress(budget: budget),
       trailing: PopupMenuButton<_CategoryAction>(
-        onSelected: (action) => _onAction(context, action),
-        itemBuilder: (_) => const [
-          PopupMenuItem(value: _CategoryAction.edit, child: Text('Edit')),
-          PopupMenuItem(value: _CategoryAction.delete, child: Text('Delete')),
+        onSelected: (action) => _onAction(context, action, budget),
+        itemBuilder: (_) => [
+          const PopupMenuItem(value: _CategoryAction.edit, child: Text('Edit')),
+          if (isExpense)
+            PopupMenuItem(
+              value: _CategoryAction.setLimit,
+              child: Text(budget == null ? 'Set limit' : 'Change limit'),
+            ),
+          if (budget != null)
+            const PopupMenuItem(
+              value: _CategoryAction.removeLimit,
+              child: Text('Remove limit'),
+            ),
+          const PopupMenuItem(
+            value: _CategoryAction.delete,
+            child: Text('Delete'),
+          ),
         ],
       ),
     );
