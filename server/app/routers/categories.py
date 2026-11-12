@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import get_current_user
+from app.models.budget import Budget
 from app.models.category import Category
 from app.models.transaction import Transaction
 from app.models.user import User
@@ -92,5 +93,7 @@ def delete_category(
         raise HTTPException(
             status.HTTP_409_CONFLICT, "Category is used by transactions. Delete them first."
         )
+    # The limit of this category is not needed anymore
+    db.execute(delete(Budget).where(Budget.category_id == category.id))
     db.delete(category)
     db.commit()
