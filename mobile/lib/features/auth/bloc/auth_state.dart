@@ -14,8 +14,12 @@ class AuthState extends Equatable {
   /// App just started, session is not checked yet.
   const AuthState.unknown() : this._(status: AuthStatus.unknown);
 
-  const AuthState.authenticated(User user)
-      : this._(status: AuthStatus.authenticated, user: user);
+  const AuthState.authenticated(User user, {String? errorMessage})
+    : this._(
+        status: AuthStatus.authenticated,
+        user: user,
+        errorMessage: errorMessage,
+      );
 
   const AuthState.unauthenticated({
     bool isSubmitting = false,

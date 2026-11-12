@@ -3,6 +3,7 @@ import 'package:cash_compass/features/accounts/data/accounts_repository.dart';
 import 'package:cash_compass/features/analytics/bloc/analytics_bloc.dart';
 import 'package:cash_compass/features/analytics/data/analytics_repository.dart';
 import 'package:cash_compass/features/analytics/ui/analytics_screen.dart';
+import 'package:cash_compass/features/auth/bloc/auth_bloc.dart';
 import 'package:cash_compass/features/budgets/bloc/budgets_bloc.dart';
 import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
 import 'package:cash_compass/features/categories/bloc/categories_bloc.dart';
@@ -10,6 +11,8 @@ import 'package:cash_compass/features/categories/data/categories_repository.dart
 import 'package:cash_compass/features/categories/ui/categories_screen.dart';
 import 'package:cash_compass/features/home/ui/home_screen.dart';
 import 'package:cash_compass/features/profile/ui/profile_screen.dart';
+import 'package:cash_compass/features/stipend/bloc/stipend_bloc.dart';
+import 'package:cash_compass/features/stipend/data/stipend_repository.dart';
 import 'package:cash_compass/features/transactions/bloc/transactions_bloc.dart';
 import 'package:cash_compass/features/transactions/data/transactions_repository.dart';
 import 'package:cash_compass/features/transactions/ui/transactions_screen.dart';
@@ -55,27 +58,41 @@ class _MainShellState extends State<MainShell> {
               BudgetsBloc(context.read<BudgetsRepository>())
                 ..add(const BudgetsRequested()),
         ),
-        // NEW: analytics for the selected month
         BlocProvider(
           create: (context) =>
               AnalyticsBloc(context.read<AnalyticsRepository>())
                 ..add(const AnalyticsRequested()),
+        ),
+        // NEW (stage 6): daily budget until the next stipend
+        BlocProvider(
+          create: (context) =>
+              StipendBloc(context.read<StipendRepository>())
+                ..add(const StipendRequested()),
         ),
       ],
       // Here the Blocs "talk" to each other. They do not know about
       // each other: these listeners connect them.
       child: MultiBlocListener(
         listeners: [
-          // A transaction changed -> balances, limits and analytics changed
+          // A transaction changed -> balances, limits, analytics
+          // and the daily budget changed too
           BlocListener<TransactionsBloc, TransactionsState>(
             listenWhen: (previous, current) =>
                 previous.changeCount != current.changeCount,
             listener: (context, state) {
               context.read<AccountsBloc>().add(const AccountsRequested());
               context.read<BudgetsBloc>().add(const BudgetsRequested());
-              // NEW: charts must show the new transaction too
               context.read<AnalyticsBloc>().add(const AnalyticsRequested());
+              // NEW (stage 6)
+              context.read<StipendBloc>().add(const StipendRequested());
             },
+          ),
+          // NEW (stage 6): stipend day changed in Profile -> recalculate
+          BlocListener<AuthBloc, AuthState>(
+            listenWhen: (previous, current) =>
+                previous.user?.stipendDay != current.user?.stipendDay,
+            listener: (context, state) =>
+                context.read<StipendBloc>().add(const StipendRequested()),
           ),
           // A category was deleted -> the server also deleted its limit
           BlocListener<CategoriesBloc, CategoriesState>(
@@ -103,7 +120,7 @@ class _MainShellState extends State<MainShell> {
             children: const [
               HomeScreen(),
               TransactionsScreen(),
-              AnalyticsScreen(), // NEW: instead of AccountsScreen
+              AnalyticsScreen(),
               CategoriesScreen(),
               ProfileScreen(),
             ],
@@ -122,7 +139,6 @@ class _MainShellState extends State<MainShell> {
                 selectedIcon: Icon(Icons.receipt_long),
                 label: 'History',
               ),
-              // NEW: instead of the Accounts tab
               NavigationDestination(
                 icon: Icon(Icons.pie_chart_outline),
                 selectedIcon: Icon(Icons.pie_chart),

@@ -13,6 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
+    on<AuthStipendSettingsChanged>(_onStipendSettingsChanged);
   }
 
   final AuthRepository _repository;
@@ -66,5 +67,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     await _repository.logout();
     emit(const AuthState.unauthenticated());
+  }
+
+  
+  Future<void> _onStipendSettingsChanged(
+    AuthStipendSettingsChanged event,
+    Emitter<AuthState> emit,
+  ) async {
+    final user = state.user;
+    if (user == null) {
+      return;
+    }
+    try {
+      final updated = await _repository.updateStipendSettings(
+        stipendDay: event.stipendDay,
+        stipendAmount: event.stipendAmount,
+      );
+      emit(AuthState.authenticated(updated));
+    } on ApiException catch (error) {
+      // Stay logged in, just show the error
+      emit(AuthState.authenticated(user, errorMessage: error.message));
+    }
   }
 }

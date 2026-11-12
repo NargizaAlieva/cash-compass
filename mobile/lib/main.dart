@@ -8,6 +8,7 @@ import 'package:cash_compass/features/transactions/data/transactions_repository.
 import 'package:flutter/material.dart';
 import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
 import 'package:cash_compass/features/analytics/data/analytics_repository.dart';
+import 'package:cash_compass/features/stipend/data/stipend_repository.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,7 @@ void main() {
       transactionsRepository: TransactionsRepository(apiClient),
       budgetsRepository: BudgetsRepository(apiClient),
       analyticsRepository: AnalyticsRepository(apiClient),
+      stipendRepository: StipendRepository(apiClient),
     ),
   );
 }
