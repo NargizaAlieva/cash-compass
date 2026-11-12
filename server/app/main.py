@@ -10,6 +10,7 @@ from app.routers import (
     auth,
     budgets,
     categories,
+    goals,
     recurring,
     stipend,
     transactions,
@@ -40,6 +41,7 @@ app.include_router(budgets.router)
 app.include_router(analytics.router)
 app.include_router(stipend.router)
 app.include_router(recurring.router)
+app.include_router(goals.router)
 
 @app.get("/health")
 def health():

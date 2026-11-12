@@ -8,6 +8,7 @@ import 'package:cash_compass/features/analytics/ui/category_pie_chart.dart';
 import 'package:cash_compass/features/analytics/ui/daily_bar_chart.dart';
 import 'package:cash_compass/features/analytics/ui/impulse_block.dart';
 import 'package:cash_compass/features/analytics/ui/spending_heatmap.dart';
+import 'package:cash_compass/features/analytics/ui/what_if_block.dart';
 import 'package:cash_compass/features/categories/bloc/categories_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -155,6 +156,13 @@ class _AnalyticsContent extends StatelessWidget {
         AnalyticsSection(
           title: 'Needed vs wanted',
           child: ImpulseBlock(impulse: data.impulse),
+        ),
+        AnalyticsSection(
+          title: 'What if I spend less?',
+          child: WhatIfBlock(
+            byCategory: data.byCategory,
+            categories: categories,
+          ),
         ),
         AnalyticsSection(
           title: 'Compared to last month',

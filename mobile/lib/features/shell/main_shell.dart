@@ -9,6 +9,8 @@ import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
 import 'package:cash_compass/features/categories/bloc/categories_bloc.dart';
 import 'package:cash_compass/features/categories/data/categories_repository.dart';
 import 'package:cash_compass/features/categories/ui/categories_screen.dart';
+import 'package:cash_compass/features/goals/bloc/goals_bloc.dart';
+import 'package:cash_compass/features/goals/data/goals_repository.dart';
 import 'package:cash_compass/features/home/ui/home_screen.dart';
 import 'package:cash_compass/features/profile/ui/profile_screen.dart';
 import 'package:cash_compass/features/recurring/bloc/recurring_bloc.dart';
@@ -76,6 +78,11 @@ class _MainShellState extends State<MainShell> {
               RecurringBloc(context.read<RecurringRepository>())
                 ..add(const RecurringRequested()),
         ),
+        BlocProvider(
+          create: (context) =>
+              GoalsBloc(context.read<GoalsRepository>())
+                ..add(const GoalsRequested()),
+        ),
       ],
       // Here the Blocs "talk" to each other. They do not know about
       // each other: these listeners connect them.
@@ -90,8 +97,9 @@ class _MainShellState extends State<MainShell> {
               context.read<AccountsBloc>().add(const AccountsRequested());
               context.read<BudgetsBloc>().add(const BudgetsRequested());
               context.read<AnalyticsBloc>().add(const AnalyticsRequested());
-              // NEW (stage 6)
               context.read<StipendBloc>().add(const StipendRequested());
+              // The saving pace for goals may change too
+              context.read<GoalsBloc>().add(const GoalsRequested());
             },
           ),
           // NEW (stage 6): stipend day changed in Profile -> recalculate

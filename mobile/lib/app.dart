@@ -3,6 +3,7 @@ import 'package:cash_compass/features/auth/bloc/auth_bloc.dart';
 import 'package:cash_compass/features/auth/data/auth_repository.dart';
 import 'package:cash_compass/features/auth/ui/auth_screen.dart';
 import 'package:cash_compass/features/categories/data/categories_repository.dart';
+import 'package:cash_compass/features/goals/data/goals_repository.dart';
 import 'package:cash_compass/features/recurring/data/recurring_repository.dart';
 import 'package:cash_compass/features/shell/main_shell.dart';
 import 'package:cash_compass/features/transactions/data/transactions_repository.dart';
@@ -25,6 +26,7 @@ class CashCompassApp extends StatelessWidget {
     required this.analyticsRepository,
     required this.stipendRepository,
     required this.recurringRepository,
+    required this.goalsRepository,
   });
 
   final AuthRepository authRepository;
@@ -35,6 +37,7 @@ class CashCompassApp extends StatelessWidget {
   final AnalyticsRepository analyticsRepository;
   final StipendRepository stipendRepository;
   final RecurringRepository recurringRepository;
+  final GoalsRepository goalsRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +51,7 @@ class CashCompassApp extends StatelessWidget {
         RepositoryProvider.value(value: analyticsRepository),
         RepositoryProvider.value(value: stipendRepository),
         RepositoryProvider.value(value: recurringRepository),
+        RepositoryProvider.value(value: goalsRepository),
       ],
       child: BlocProvider(
         create: (_) => AuthBloc(authRepository)..add(const AuthStarted()),
