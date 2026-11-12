@@ -1,21 +1,34 @@
+import 'package:cash_compass/features/accounts/data/accounts_repository.dart';
 import 'package:cash_compass/features/auth/bloc/auth_bloc.dart';
 import 'package:cash_compass/features/auth/data/auth_repository.dart';
 import 'package:cash_compass/features/auth/ui/auth_screen.dart';
-import 'package:cash_compass/features/home/ui/home_screen.dart';
+import 'package:cash_compass/features/categories/data/categories_repository.dart';
+import 'package:cash_compass/features/shell/main_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 const _seedColor = Color(0xFF0F766E);
 
 class CashCompassApp extends StatelessWidget {
-  const CashCompassApp({super.key, required this.authRepository});
+  const CashCompassApp({
+    super.key,
+    required this.authRepository,
+    required this.accountsRepository,
+    required this.categoriesRepository,
+  });
 
   final AuthRepository authRepository;
+  final AccountsRepository accountsRepository;
+  final CategoriesRepository categoriesRepository;
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: authRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: authRepository),
+        RepositoryProvider.value(value: accountsRepository),
+        RepositoryProvider.value(value: categoriesRepository),
+      ],
       child: BlocProvider(
         create: (_) => AuthBloc(authRepository)..add(const AuthStarted()),
         child: MaterialApp(
@@ -45,7 +58,7 @@ class _AuthGate extends StatelessWidget {
         AuthStatus.unknown => const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           ),
-        AuthStatus.authenticated => const HomeScreen(),
+        AuthStatus.authenticated => const MainShell(),
         AuthStatus.unauthenticated => const AuthScreen(),
       },
     );
