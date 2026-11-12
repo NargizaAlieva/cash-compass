@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-/// "Today you can spend 3 200 ₸ · 13 days until the stipend".
+/// "Today you can spend 3 200 som · 13 days until the stipend".
 class StipendCard extends StatelessWidget {
   const StipendCard({super.key});
 

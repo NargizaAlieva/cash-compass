@@ -2,9 +2,9 @@ import 'package:intl/intl.dart';
 
 final _moneyFormat = NumberFormat('#,##0.##', 'en_US');
 
-/// 1234567.5 -> "1 234 567.5 ₸"
+/// 1234567.5 -> "1 234 567.5 som"
 String formatMoney(double amount) =>
-    '${_moneyFormat.format(amount).replaceAll(',', ' ')} ₸';
+    '${_moneyFormat.format(amount).replaceAll(',', ' ')} som';
 
 /// Reads what the user typed. Accepts "15 000", "1500,50" and "1500.50".
 double? parseAmount(String text) =>

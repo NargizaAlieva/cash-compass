@@ -4,7 +4,7 @@ import 'package:cash_compass/features/analytics/ui/analytics_section.dart';
 import 'package:cash_compass/features/categories/data/category.dart';
 import 'package:flutter/material.dart';
 
-/// "Transport: 6 500 ₸ on 5 Nov, 4.3x your usual 1 500 ₸".
+/// "Transport: 6 500 som on 5 Nov, 4.3x your usual 1 500 som".
 class AnomaliesBlock extends StatelessWidget {
   const AnomaliesBlock({
     super.key,

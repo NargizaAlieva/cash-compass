@@ -131,7 +131,7 @@ class _RecurringFormScreenState extends State<RecurringFormScreen> {
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Amount every month',
-                suffixText: '₸',
+                suffixText: 'som',
                 border: OutlineInputBorder(),
               ),
               validator: (value) {

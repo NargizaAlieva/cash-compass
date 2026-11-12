@@ -208,14 +208,14 @@ class _GoalDialogState extends State<_GoalDialog> {
             TextFormField(
               controller: _target,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Target', suffixText: '₸'),
+              decoration: const InputDecoration(labelText: 'Target', suffixText: 'som'),
               validator: (v) => _amountValidator(v, allowZero: false),
             ),
             TextFormField(
               controller: _saved,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration:
-                  const InputDecoration(labelText: 'Already saved', suffixText: '₸'),
+                  const InputDecoration(labelText: 'Already saved', suffixText: 'som'),
               validator: (v) => _amountValidator(v, allowZero: true),
             ),
           ],

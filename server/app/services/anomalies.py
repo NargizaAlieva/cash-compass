@@ -21,7 +21,7 @@ MIN_HISTORY = 5  # fewer purchases than this = we do not know what is usual
 MAD_FACTOR = 3  # how many "typical deviations" above the median is unusual
 MIN_TIMES = 2  # and at least twice the usual purchase
 CATEGORY_TIMES = 1.5  # category month total vs the usual month
-CATEGORY_MIN_DIFF = 5000  # ignore small differences in tenge
+CATEGORY_MIN_DIFF = 5000  # ignore small differences in som
 
 
 def _expenses(db: Session, user_id: int, start, end) -> list[Transaction]:

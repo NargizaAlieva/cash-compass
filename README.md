@@ -33,18 +33,18 @@ clear spending analytics, and one simple answer every morning:
 - History grouped by day with filters
 
 **What makes it different**
-- **Until-stipend budget** — "You can spend 3 462 ₸ today · 13 days until the stipend".
+- **Until-stipend budget** — "You can spend 3 462 som today · 13 days until the stipend".
   The daily number is calculated from this morning's money, so it does not jump after every purchase.
 - **Impulse purchase index** — mark a purchase as "wanted, not needed" and see what share of the
   month went to impulses.
-- **Category limits** — "Food: 20 000 ₸ a month" with green / yellow (80%) / red (100%) progress
+- **Category limits** — "Food: 20 000 som a month" with green / yellow (80%) / red (100%) progress
   and a warning on the Home screen.
 - **Analytics** — pie chart by category, spending by day, a spending heatmap calendar,
   comparison with last month, average per day and a forecast for the end of the month.
 - **Regular payments** — rent, subscriptions, phone: the server adds them every month by itself
   (missed months included, never twice). Payments due before the stipend are put aside,
   so the daily budget stays honest.
-- **Savings goals** — "Laptop 400 000 ₸ → at this pace: March 2027", based on the average saving
+- **Savings goals** — "Laptop 400 000 som → at this pace: March 2027", based on the average saving
   of the last 3 months.
 - **What-if simulator** — "spend 30% less on Food" → money per month and per year, and how many
   months sooner a goal is reached. Calculated on the phone, instantly.

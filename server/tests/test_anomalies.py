@@ -56,7 +56,7 @@ def test_category_month_much_bigger_than_usual(client, auth_headers, add):
 
 
 def test_small_category_difference_is_ignored():
-    # 1 000 -> 2 000 is twice as much, but only 1 000 tenge: not worth an alarm
+    # 1 000 -> 2 000 is twice as much, but only 1 000 som: not worth an alarm
     assert unusual_categories({1: 2000}, [{1: 1000}]) == []
 
 

@@ -12,14 +12,14 @@ const cash = Account(
   id: 1,
   name: 'Cash',
   type: AccountType.cash,
-  currency: 'KZT',
+  currency: 'KGS',
   balance: 15000,
 );
 const card = Account(
   id: 2,
   name: 'Kaspi Gold',
   type: AccountType.card,
-  currency: 'KZT',
+  currency: 'KGS',
   balance: 80000,
 );
 

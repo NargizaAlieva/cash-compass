@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('formatMoney adds spaces and the tenge sign', () {
-    expect(formatMoney(0), '0 ₸');
-    expect(formatMoney(1500), '1 500 ₸');
-    expect(formatMoney(1234567.5), '1 234 567.5 ₸');
+  test('formatMoney adds spaces and the som sign', () {
+    expect(formatMoney(0), '0 som');
+    expect(formatMoney(1500), '1 500 som');
+    expect(formatMoney(1234567.5), '1 234 567.5 som');
   });
 
   test('colorFromHex reads #RRGGBB', () {

@@ -197,7 +197,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
               style: theme.textTheme.headlineSmall,
               decoration: const InputDecoration(
                 labelText: 'Amount',
-                suffixText: '₸',
+                suffixText: 'som',
                 border: OutlineInputBorder(),
               ),
               validator: (value) {

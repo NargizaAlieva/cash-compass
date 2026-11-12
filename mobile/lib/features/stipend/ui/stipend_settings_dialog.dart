@@ -83,7 +83,7 @@ class _StipendDialogState extends State<_StipendDialog> {
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Amount (optional)',
-                suffixText: '₸',
+                suffixText: 'som',
                 border: OutlineInputBorder(),
               ),
               validator: (value) {

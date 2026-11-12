@@ -19,7 +19,7 @@ def test_create_account(client, auth_headers):
     body = response.json()
     assert body["name"] == "Kaspi Gold"
     assert body["type"] == "card"
-    assert body["currency"] == "KZT"
+    assert body["currency"] == "KGS"
     assert body["balance"] == 50000
 
 

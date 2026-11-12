@@ -116,7 +116,7 @@ class _AccountFormDialogState extends State<_AccountFormDialog> {
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Current balance',
-                  suffixText: '₸',
+                  suffixText: 'som',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) =>

@@ -10,7 +10,7 @@ Color budgetLevelColor(BuildContext context, BudgetLevel level) =>
       BudgetLevel.over => Theme.of(context).colorScheme.error,
     };
 
-/// Progress bar + "12 000 of 40 000 ₸ · 30%".
+/// Progress bar + "12 000 of 40 000 som · 30%".
 class BudgetProgress extends StatelessWidget {
   const BudgetProgress({super.key, required this.budget});
 

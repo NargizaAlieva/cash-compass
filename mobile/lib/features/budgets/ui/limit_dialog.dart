@@ -57,7 +57,7 @@ class _LimitDialogState extends State<_LimitDialog> {
           onFieldSubmitted: (_) => _save(),
           decoration: const InputDecoration(
             labelText: 'Per month',
-            suffixText: '₸',
+            suffixText: 'som',
             border: OutlineInputBorder(),
           ),
           validator: (value) {

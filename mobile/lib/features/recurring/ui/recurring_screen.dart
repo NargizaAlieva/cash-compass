@@ -125,7 +125,7 @@ class RecurringScreen extends StatelessWidget {
   }
 }
 
-/// "16 990 ₸ a month · 203 880 ₸ a year".
+/// "16 990 som a month · 203 880 som a year".
 class _TotalsCard extends StatelessWidget {
   const _TotalsCard({required this.monthly, required this.yearly});
 
