@@ -52,4 +52,16 @@ class AuthRepository {
   }
 
   Future<void> logout() => _tokenStorage.delete();
+
+  /// Saves the stipend day (1-31) and the amount (null = not set).
+  Future<User> updateStipendSettings({
+    required int stipendDay,
+    double? stipendAmount,
+  }) async {
+    final data = await _api.put(
+      '/auth/me',
+      data: {'stipend_day': stipendDay, 'stipend_amount': stipendAmount},
+    );
+    return User.fromJson(data as Map<String, dynamic>);
+  }
 }

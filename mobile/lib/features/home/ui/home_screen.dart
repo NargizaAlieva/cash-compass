@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cash_compass/features/budgets/ui/budget_alerts_card.dart';
 import 'package:cash_compass/features/accounts/ui/accounts_screen.dart';
+import 'package:cash_compass/features/stipend/ui/stipend_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -48,6 +49,9 @@ class HomeScreen extends StatelessWidget {
         children: [
           Text('Hello, ${name ?? ''}!', style: theme.textTheme.headlineSmall),
           const SizedBox(height: 16),
+          // The main feature: daily budget until the next stipend
+          const StipendCard(),
+          const SizedBox(height: 8),
                     TotalBalanceCard(total: total, onTap: () => _openAccounts(context)),
           const SizedBox(height: 8),
           // Shows nothing when all limits are fine

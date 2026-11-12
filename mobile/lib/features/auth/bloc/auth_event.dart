@@ -40,3 +40,18 @@ final class AuthRegisterRequested extends AuthEvent {
 final class AuthLogoutRequested extends AuthEvent {
   const AuthLogoutRequested();
 }
+
+
+/// The user saved stipend settings in Profile (or on Home).
+final class AuthStipendSettingsChanged extends AuthEvent {
+  const AuthStipendSettingsChanged({
+    required this.stipendDay,
+    this.stipendAmount,
+  });
+
+  final int stipendDay;
+  final double? stipendAmount;
+
+  @override
+  List<Object?> get props => [stipendDay, stipendAmount];
+}
