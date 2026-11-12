@@ -3,6 +3,7 @@ import 'package:cash_compass/core/ui/formatters.dart';
 import 'package:cash_compass/features/analytics/bloc/analytics_bloc.dart';
 import 'package:cash_compass/features/analytics/data/month_analytics.dart';
 import 'package:cash_compass/features/analytics/ui/analytics_section.dart';
+import 'package:cash_compass/features/analytics/ui/anomalies_block.dart';
 import 'package:cash_compass/features/analytics/ui/category_changes_block.dart';
 import 'package:cash_compass/features/analytics/ui/category_pie_chart.dart';
 import 'package:cash_compass/features/analytics/ui/daily_bar_chart.dart';
@@ -138,6 +139,13 @@ class _AnalyticsContent extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         AnalyticsSection(title: 'Overview', child: _Overview(data: data)),
+        AnalyticsSection(
+          title: 'Unusual spending',
+          child: AnomaliesBlock(
+            anomalies: data.anomalies,
+            categories: categories,
+          ),
+        ),
         AnalyticsSection(
           title: 'Spending by category',
           child: CategoryPieChart(

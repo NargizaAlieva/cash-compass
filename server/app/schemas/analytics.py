@@ -1,5 +1,7 @@
 from datetime import date as Date
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -35,6 +37,18 @@ class ImpulseStats(BaseModel):
     percent: float  # share of all expenses this month
 
 
+class Anomaly(BaseModel):
+    """Unusual spending found by the detector (see services/anomalies.py)."""
+
+    kind: Literal["purchase", "category"]  # one big purchase / a whole category
+    category_id: int | None
+    transaction_id: int | None = None  # only for "purchase"
+    date: Date | None = None  # only for "purchase"
+    amount: float
+    usual: float  # usual purchase / usual month for this category
+    times: float  # amount / usual, e.g. 4.2
+
+
 class MonthAnalytics(BaseModel):
     month: str
     income: float
@@ -50,3 +64,4 @@ class MonthAnalytics(BaseModel):
     daily: list[DayAmount]  # every day of the month, also days with 0
     category_changes: list[CategoryChange]
     impulse: ImpulseStats
+    anomalies: list[Anomaly]  # the most unusual first, at most 5

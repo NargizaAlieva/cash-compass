@@ -90,6 +90,43 @@ class ImpulseStats extends Equatable {
   List<Object?> get props => [amount, count, percent];
 }
 
+/// Unusual spending found by the server.
+class Anomaly extends Equatable {
+  const Anomaly({
+    required this.isPurchase,
+    required this.categoryId,
+    required this.amount,
+    required this.usual,
+    required this.times,
+    this.date,
+  });
+
+  factory Anomaly.fromJson(Map<String, dynamic> json) {
+    final date = json['date'] as String?;
+    return Anomaly(
+      isPurchase: json['kind'] == 'purchase',
+      categoryId: json['category_id'] as int?,
+      amount: _toDouble(json['amount']),
+      usual: _toDouble(json['usual']),
+      times: _toDouble(json['times']),
+      date: date == null ? null : DateTime.parse(date),
+    );
+  }
+
+  /// true = one big purchase, false = the whole category this month.
+  final bool isPurchase;
+  final int? categoryId;
+  final double amount;
+
+  /// The usual purchase (or the usual month) in this category.
+  final double usual;
+  final double times;
+  final DateTime? date;
+
+  @override
+  List<Object?> get props => [isPurchase, categoryId, amount, usual, times, date];
+}
+
 /// Response of GET /analytics/month.
 class MonthAnalytics extends Equatable {
   const MonthAnalytics({
@@ -105,6 +142,7 @@ class MonthAnalytics extends Equatable {
     required this.daily,
     required this.categoryChanges,
     required this.impulse,
+    this.anomalies = const [],
   });
 
   factory MonthAnalytics.fromJson(Map<String, dynamic> json) {
@@ -127,6 +165,10 @@ class MonthAnalytics extends Equatable {
       daily: list('daily', DayAmount.fromJson),
       categoryChanges: list('category_changes', CategoryChange.fromJson),
       impulse: ImpulseStats.fromJson(json['impulse'] as Map<String, dynamic>),
+      // An older server has no anomalies yet, so the field is optional
+      anomalies: json['anomalies'] == null
+          ? const []
+          : list('anomalies', Anomaly.fromJson),
     );
   }
 
@@ -153,6 +195,9 @@ class MonthAnalytics extends Equatable {
   final List<CategoryChange> categoryChanges;
   final ImpulseStats impulse;
 
+  /// The most unusual first.
+  final List<Anomaly> anomalies;
+
   @override
   List<Object?> get props => [
         month,
@@ -167,5 +212,6 @@ class MonthAnalytics extends Equatable {
         daily,
         categoryChanges,
         impulse,
+        anomalies,
       ];
 }
