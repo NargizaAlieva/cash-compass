@@ -6,6 +6,7 @@ import 'package:cash_compass/features/transactions/ui/open_transaction_form.dart
 import 'package:cash_compass/features/transactions/ui/transaction_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cash_compass/features/budgets/ui/budget_alerts_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -31,8 +32,11 @@ class HomeScreen extends StatelessWidget {
         children: [
           Text('Hello, ${name ?? ''}!', style: theme.textTheme.headlineSmall),
           const SizedBox(height: 16),
-          TotalBalanceCard(total: total),
-          const SizedBox(height: 24),
+                    TotalBalanceCard(total: total),
+          const SizedBox(height: 8),
+          // Shows nothing when all limits are fine
+          const BudgetAlertsCard(),
+          const SizedBox(height: 16),
           Text('Recent transactions', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           if (recent.isEmpty)

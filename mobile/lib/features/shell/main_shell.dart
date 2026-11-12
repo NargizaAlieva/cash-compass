@@ -1,6 +1,8 @@
 import 'package:cash_compass/features/accounts/bloc/accounts_bloc.dart';
 import 'package:cash_compass/features/accounts/data/accounts_repository.dart';
 import 'package:cash_compass/features/accounts/ui/accounts_screen.dart';
+import 'package:cash_compass/features/budgets/bloc/budgets_bloc.dart';
+import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
 import 'package:cash_compass/features/categories/bloc/categories_bloc.dart';
 import 'package:cash_compass/features/categories/data/categories_repository.dart';
 import 'package:cash_compass/features/categories/ui/categories_screen.dart';
@@ -46,14 +48,44 @@ class _MainShellState extends State<MainShell> {
               TransactionsBloc(context.read<TransactionsRepository>())
                 ..add(const TransactionsRequested()),
         ),
+        BlocProvider(
+          create: (context) =>
+              BudgetsBloc(context.read<BudgetsRepository>())
+                ..add(const BudgetsRequested()),
+        ),
       ],
-      // When a transaction is added, changed or deleted, balances change too,
-      // so we ask AccountsBloc to reload. This is how two Blocs talk.
-      child: BlocListener<TransactionsBloc, TransactionsState>(
-        listenWhen: (previous, current) =>
-            previous.changeCount != current.changeCount,
-        listener: (context, state) =>
-            context.read<AccountsBloc>().add(const AccountsRequested()),
+      // Here the Blocs "talk" to each other. They do not know about
+      // each other: these listeners connect them.
+      child: MultiBlocListener(
+        listeners: [
+          // A transaction changed -> balances and spent amounts changed too
+          BlocListener<TransactionsBloc, TransactionsState>(
+            listenWhen: (previous, current) =>
+                previous.changeCount != current.changeCount,
+            listener: (context, state) {
+              context.read<AccountsBloc>().add(const AccountsRequested());
+              context.read<BudgetsBloc>().add(const BudgetsRequested());
+            },
+          ),
+          // A category was deleted -> the server also deleted its limit
+          BlocListener<CategoriesBloc, CategoriesState>(
+            listenWhen: (previous, current) =>
+                current.categories.length < previous.categories.length,
+            listener: (context, state) =>
+                context.read<BudgetsBloc>().add(const BudgetsRequested()),
+          ),
+          // Errors about limits can happen on any tab
+          BlocListener<BudgetsBloc, BudgetsState>(
+            listenWhen: (previous, current) =>
+                current.errorMessage != null &&
+                previous.errorMessage != current.errorMessage,
+            listener: (context, state) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+            },
+          ),
+        ],
         child: Scaffold(
           // IndexedStack keeps every tab alive, so switching tabs is instant
           body: IndexedStack(
