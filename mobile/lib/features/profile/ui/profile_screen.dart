@@ -1,6 +1,7 @@
 import 'package:cash_compass/core/ui/confirm_dialog.dart';
 import 'package:cash_compass/core/ui/formatters.dart';
 import 'package:cash_compass/features/auth/bloc/auth_bloc.dart';
+import 'package:cash_compass/features/goals/ui/goals_screen.dart';
 import 'package:cash_compass/features/recurring/ui/recurring_screen.dart';
 import 'package:cash_compass/features/stipend/ui/stipend_settings_dialog.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,13 @@ class ProfileScreen extends StatelessWidget {
               subtitle: const Text('Rent, subscriptions, phone...'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => openRecurringScreen(context),
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag_outlined),
+              title: const Text('Savings goals'),
+              subtitle: const Text('Laptop, trip... with a forecast'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => openGoalsScreen(context),
             ),
             const Divider(),
             ListTile(
