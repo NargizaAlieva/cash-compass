@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.models.account import Account
+from app.models.transaction import Transaction
 from app.models.user import User
 from app.schemas.account import AccountCreate, AccountOut, AccountsSummary, AccountUpdate
 
@@ -66,5 +67,19 @@ def delete_account(
     db: Session = Depends(get_db),
 ):
     account = get_own_account(account_id, current_user, db)
+    used = db.scalar(
+        select(Transaction.id)
+        .where(
+            or_(
+                Transaction.account_id == account.id,
+                Transaction.to_account_id == account.id,
+            )
+        )
+        .limit(1)
+    )
+    if used is not None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Account has transactions. Delete them first."
+        )
     db.delete(account)
     db.commit()
