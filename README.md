@@ -41,6 +41,15 @@ clear spending analytics, and one simple answer every morning:
   and a warning on the Home screen.
 - **Analytics** — pie chart by category, spending by day, a spending heatmap calendar,
   comparison with last month, average per day and a forecast for the end of the month.
+- **Regular payments** — rent, subscriptions, phone: the server adds them every month by itself
+  (missed months included, never twice). Payments due before the stipend are put aside,
+  so the daily budget stays honest.
+- **Savings goals** — "Laptop 400 000 ₸ → at this pace: March 2027", based on the average saving
+  of the last 3 months.
+- **What-if simulator** — "spend 30% less on Food" → money per month and per year, and how many
+  months sooner a goal is reached. Calculated on the phone, instantly.
+- **Unusual spending detector** — finds a purchase far above what is usual for its category
+  (median + 3·MAD, robust to old outliers) and categories whose month is 1.5× the usual one.
 
 ## Course requirements
 
@@ -49,7 +58,7 @@ clear spending analytics, and one simple answer every morning:
 | Cross-platform mobile app (Flutter) | One Flutter code base for Android, iOS and Web (`mobile/`) |
 | Mobile communicates with a server | Own REST API on FastAPI (`server/`), deployed on Render with PostgreSQL. All calculations (balances, limits, analytics, stipend budget) are done on the server |
 | Pushed on GitHub | Every feature in its own branch and pull request, GitHub Actions runs analysis and all tests on every push |
-| State management (Bloc) | 7 Blocs with events and states: `AuthBloc`, `AccountsBloc`, `CategoriesBloc`, `TransactionsBloc`, `BudgetsBloc`, `AnalyticsBloc`, `StipendBloc`, each covered by `bloc_test` |
+| State management (Bloc) | 9 Blocs with events and states: `AuthBloc`, `AccountsBloc`, `CategoriesBloc`, `TransactionsBloc`, `BudgetsBloc`, `AnalyticsBloc`, `StipendBloc`, `RecurringBloc`, `GoalsBloc`, each covered by `bloc_test` |
 
 ## Architecture
 
@@ -72,7 +81,8 @@ flowchart LR
 - **Blocs** hold the logic of the app and never know about HTTP.
 - **Repositories** turn JSON into Dart models.
 - **Blocs talk through listeners.** When `TransactionsBloc` saves a change, a listener in
-  `MainShell` asks `AccountsBloc`, `BudgetsBloc`, `AnalyticsBloc` and `StipendBloc` to reload.
+  `MainShell` asks `AccountsBloc`, `BudgetsBloc`, `AnalyticsBloc`, `StipendBloc` and `GoalsBloc`
+  to reload. A change of a regular payment reloads transactions and balances the same way.
   The Blocs do not know about each other.
 
 ## Tech stack
@@ -82,7 +92,7 @@ flowchart LR
 | Mobile | Flutter, `flutter_bloc`, `equatable`, `dio`, `flutter_secure_storage`, `fl_chart`, `intl` |
 | Mobile tests | `flutter_test`, `bloc_test`, `mocktail` |
 | Server | Python 3.13, FastAPI, SQLAlchemy 2, Pydantic, PyJWT, bcrypt |
-| Database | SQLite locally, PostgreSQL in production |
+| Database | SQLite locally, PostgreSQL in production, Alembic migrations |
 | Server tests | `pytest` (in-memory SQLite, also checked on PostgreSQL) |
 | CI / CD | GitHub Actions, Render Blueprint (`render.yaml`) |
 
@@ -95,13 +105,14 @@ cash-compass/
 │   │   ├── core/            API client, config, shared widgets
 │   │   └── features/        one folder per feature: data / bloc / ui
 │   │       ├── auth/  accounts/  categories/  transactions/
-│   │       ├── budgets/  analytics/  stipend/
+│   │       ├── budgets/  analytics/  stipend/  recurring/  goals/
 │   │       └── home/  profile/  shell/
 │   └── test/                Bloc and model tests
 ├── server/                  FastAPI server
 │   ├── app/
 │   │   ├── routers/         HTTP endpoints
-│   │   ├── services/        calculations (balances, budgets, analytics, stipend)
+│   │   ├── services/        calculations (balances, budgets, analytics, stipend,
+│   │   │                    recurring payments, goals, anomalies)
 │   │   ├── models/          database tables
 │   │   └── schemas/         request and response formats
 │   ├── scripts/seed_demo.py demo data
@@ -122,8 +133,10 @@ Users only see their own data.
 | Categories | `GET /categories?kind=`, `POST`, `PUT /categories/{id}`, `DELETE /categories/{id}` |
 | Transactions | `GET /transactions?date_from=&date_to=&kind=&account_id=&category_id=&q=`, `GET/POST/PUT/DELETE` |
 | Limits | `GET /budgets?month=`, `PUT /budgets/{category_id}`, `DELETE /budgets/{category_id}` |
-| Analytics | `GET /analytics/month?month=2026-11` |
+| Analytics | `GET /analytics/month?month=2026-11` (also returns unusual spending) |
 | Stipend | `GET /stipend/allowance` |
+| Regular payments | `GET /recurring` (with monthly/yearly totals), `POST`, `PUT /recurring/{id}`, `DELETE /recurring/{id}` |
+| Goals | `GET /goals` (with saving pace and forecasts), `POST`, `PUT /goals/{id}`, `DELETE /goals/{id}` |
 
 Full interactive docs: https://cash-compass-api.onrender.com/docs
 
@@ -165,14 +178,24 @@ for the last three months. Today is left empty, so a purchase can be added live 
 
 ```
 cd server
-.venv\Scripts\python.exe -m pytest      # 93 tests
+.venv\Scripts\python.exe -m pytest      # 127 tests
 
 cd mobile
 flutter analyze
-flutter test                            # 48 tests
+flutter test                            # 59 tests
 ```
 
 Both run automatically in GitHub Actions on every push and pull request.
+
+## Database migrations
+
+The database schema is managed by Alembic (`server/alembic/versions`). The server applies new
+migrations on startup, locally and on Render. After changing a model:
+```
+cd server
+.venv\Scripts\python.exe -m alembic revision --autogenerate -m "what changed"
+```
+A test fails if a model and the migrations do not match.
 
 ## Deploy
 
