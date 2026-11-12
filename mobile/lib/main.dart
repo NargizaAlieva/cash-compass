@@ -4,6 +4,7 @@ import 'package:cash_compass/core/storage/token_storage.dart';
 import 'package:cash_compass/features/accounts/data/accounts_repository.dart';
 import 'package:cash_compass/features/auth/data/auth_repository.dart';
 import 'package:cash_compass/features/categories/data/categories_repository.dart';
+import 'package:cash_compass/features/transactions/data/transactions_repository.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,6 +18,7 @@ void main() {
       authRepository: AuthRepository(apiClient, tokenStorage),
       accountsRepository: AccountsRepository(apiClient),
       categoriesRepository: CategoriesRepository(apiClient),
+      transactionsRepository: TransactionsRepository(apiClient),
     ),
   );
 }
