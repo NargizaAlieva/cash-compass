@@ -177,11 +177,18 @@ def main():
     print("Account:", args.email, "(new)" if created else "(already existed)")
 
     if api.call("GET", "/transactions?limit=1"):
-        print("This account already has transactions. Nothing was changed.")
-        print("Use another --email to create a fresh demo account.")
-        return
+        print("The account already has history: only missing extras are added.")
+    else:
+        add_history(api)
+    add_extras(api)
 
-    # Accounts with starting balances
+    total = api.call("GET", "/accounts")["total_balance"]
+    print(f"Done. Total balance {total:,.0f} KZT")
+    print(f"Log in with {args.email} / {args.password}")
+
+
+def add_history(api: Api) -> None:
+    """Accounts, stipend, limits and 3 months of transactions for a new account."""
     accounts = {}
     for name, kind, balance in [
         ("Kaspi Gold", "card", 120000),
@@ -191,26 +198,11 @@ def main():
         accounts[name] = api.call("POST", "/accounts", {
             "name": name, "type": kind, "balance": balance,
         })["id"]
-
     cats = {c["name"]: c["id"] for c in api.call("GET", "/categories")}
 
-    # Stipend settings and monthly limits
     api.call("PUT", "/auth/me", {"stipend_day": 25, "stipend_amount": 45000})
     for category, limit in [("Food", 20000), ("Entertainment", 8000), ("Transport", 10000)]:
         api.call("PUT", f"/budgets/{cats[category]}", {"limit_amount": limit})
-
-    # Regular payments: from now on the server adds them every month by itself.
-    # The first charge is today or later, so there are no duplicates
-    # with the history below (it ends yesterday).
-    for name, amount, account, category, day in [
-        ("Dormitory", 15000, "Kaspi Gold", "Housing", 1),
-        ("Spotify", 1990, "Halyk", "Subscriptions", 3),
-        ("YouTube Premium", 1490, "Halyk", "Subscriptions", 12),
-    ]:
-        api.call("POST", "/recurring", {
-            "name": name, "amount": amount, "account_id": accounts[account],
-            "category_id": cats[category], "day_of_month": day,
-        })
 
     transactions = build_transactions(date.today(), accounts, cats)
     for number, transaction in enumerate(transactions, start=1):
@@ -218,9 +210,60 @@ def main():
         if number % 25 == 0:
             print(f"  {number}/{len(transactions)} transactions...")
 
-    total = api.call("GET", "/accounts")["total_balance"]
-    print(f"Done: {len(transactions)} transactions, total balance {total:,.0f} KZT")
-    print(f"Log in with {args.email} / {args.password}")
+
+def add_extras(api: Api) -> None:
+    """Data for the newer features. Each part is added only if it is missing,
+    so the script can be run again on an old demo account."""
+    accounts = {a["name"]: a["id"] for a in api.call("GET", "/accounts")["accounts"]}
+    cats = {c["name"]: c["id"] for c in api.call("GET", "/categories")}
+    today = date.today()
+
+    # Regular payments. The first charge is today or later,
+    # so there are no duplicates with the history (it ends yesterday).
+    if not api.call("GET", "/recurring")["items"]:
+        for name, amount, account, category, day in [
+            ("Dormitory", 15000, "Kaspi Gold", "Housing", 1),
+            ("Spotify", 1990, "Halyk", "Subscriptions", 3),
+            ("YouTube Premium", 1490, "Halyk", "Subscriptions", 12),
+        ]:
+            api.call("POST", "/recurring", {
+                "name": name, "amount": amount, "account_id": accounts[account],
+                "category_id": cats[category], "day_of_month": day,
+            })
+        print("  + regular payments")
+
+    # Freelance income in the last two full months: the student saves money,
+    # so goals get a forecast
+    if not api.call("GET", "/transactions?q=Freelance%20project"):
+        first_of_month = today.replace(day=1)
+        for months_back in (1, 2):
+            day = first_of_month
+            for _ in range(months_back):
+                day = (day - timedelta(days=1)).replace(day=1)
+            api.call("POST", "/transactions", {
+                "kind": "income", "amount": 30000, "date": day.replace(day=20).isoformat(),
+                "account_id": accounts["Kaspi Gold"], "category_id": cats["Other income"],
+                "note": "Freelance project",
+            })
+        print("  + freelance income")
+
+    if not api.call("GET", "/goals")["goals"]:
+        for name, target, saved in [("Laptop", 400000, 60000), ("Trip to Almaty", 90000, 30000)]:
+            api.call("POST", "/goals", {
+                "name": name, "target_amount": target, "saved_amount": saved,
+            })
+        print("  + goals")
+
+    # One unusual purchase this month for the detector (also breaks the
+    # Entertainment limit, so Home shows a red warning)
+    if not api.call("GET", "/transactions?q=Concert%20VIP"):
+        day = today - timedelta(days=1) if today.day > 1 else today
+        api.call("POST", "/transactions", {
+            "kind": "expense", "amount": 15000, "date": day.isoformat(),
+            "account_id": accounts["Kaspi Gold"], "category_id": cats["Entertainment"],
+            "note": "Concert VIP", "is_impulsive": True,
+        })
+        print("  + unusual purchase")
 
 
 if __name__ == "__main__":
