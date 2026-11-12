@@ -12,8 +12,10 @@ class ApiClient {
       : _dio = Dio(
           BaseOptions(
             baseUrl: AppConfig.baseUrl,
-            connectTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 10),
+            connectTimeout: const Duration(seconds: 30),
+            // A free server on Render sleeps when nobody uses it and needs
+            // up to a minute to wake up, so we wait longer than usual
+            receiveTimeout: const Duration(seconds: 60),
             contentType: 'application/json',
           ),
         ) {

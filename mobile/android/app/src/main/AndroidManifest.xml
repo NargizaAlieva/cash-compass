@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The release app talks to the server on Render -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="cash_compass"
+        android:label="CashCompass"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
