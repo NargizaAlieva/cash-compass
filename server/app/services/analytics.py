@@ -11,6 +11,7 @@ from app.schemas.analytics import (
     ImpulseStats,
     MonthAnalytics,
 )
+from app.services.anomalies import unusual_categories, unusual_purchases
 from app.services.months import month_range
 
 
@@ -144,6 +145,16 @@ def month_analytics(
         reverse=True,
     )
 
+    # Unusual spending: single purchases and whole categories
+    months_before = [prev_month]
+    for _ in range(2):
+        months_before.append(previous_month(months_before[-1]))
+    category_history = [expense_by_category(db, user_id, m) for m in months_before]
+    anomalies = unusual_purchases(db, user_id, month) + unusual_categories(
+        by_category_raw, [m for m in category_history if m]
+    )
+    anomalies.sort(key=lambda item: item.times, reverse=True)
+
     return MonthAnalytics(
         month=month,
         income=totals["income"],
@@ -157,4 +168,5 @@ def month_analytics(
         daily=daily,
         category_changes=category_changes,
         impulse=impulse_stats(db, user_id, month, expense),
+        anomalies=anomalies[:5],
     )
