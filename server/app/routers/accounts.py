@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.models.account import Account
+from app.models.recurring_payment import RecurringPayment
 from app.models.transaction import Transaction
 from app.models.user import User
 from app.schemas.account import AccountCreate, AccountOut, AccountsSummary, AccountUpdate
@@ -80,6 +81,10 @@ def delete_account(
     if used is not None:
         raise HTTPException(
             status.HTTP_409_CONFLICT, "Account has transactions. Delete them first."
+        )
+    if db.scalar(select(RecurringPayment.id).where(RecurringPayment.account_id == account.id)):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Account is used by a regular payment. Delete it first."
         )
     db.delete(account)
     db.commit()

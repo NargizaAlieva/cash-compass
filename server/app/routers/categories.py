@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.models.budget import Budget
 from app.models.category import Category
+from app.models.recurring_payment import RecurringPayment
 from app.models.transaction import Transaction
 from app.models.user import User
 from app.schemas.category import CategoryCreate, CategoryKind, CategoryOut, CategoryUpdate
@@ -92,6 +93,10 @@ def delete_category(
     if used is not None:
         raise HTTPException(
             status.HTTP_409_CONFLICT, "Category is used by transactions. Delete them first."
+        )
+    if db.scalar(select(RecurringPayment.id).where(RecurringPayment.category_id == category.id)):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Category is used by a regular payment. Delete it first."
         )
     # The limit of this category is not needed anymore
     db.execute(delete(Budget).where(Budget.category_id == category.id))

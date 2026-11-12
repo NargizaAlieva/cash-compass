@@ -4,7 +4,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.migrations import run_migrations
-from app.routers import accounts, analytics, auth, budgets, categories, stipend, transactions
+from app.routers import (
+    accounts,
+    analytics,
+    auth,
+    budgets,
+    categories,
+    recurring,
+    stipend,
+    transactions,
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,6 +39,7 @@ app.include_router(transactions.router)
 app.include_router(budgets.router)
 app.include_router(analytics.router)
 app.include_router(stipend.router)
+app.include_router(recurring.router)
 
 @app.get("/health")
 def health():

@@ -1,10 +1,11 @@
+from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from sqlalchemy import create_engine, inspect, text
 
 import app.models  # noqa: F401 - registers all tables
 from app.core.database import Base
-from app.core.migrations import INITIAL_REVISION, run_migrations
+from app.core.migrations import INITIAL_REVISION, alembic_config, run_migrations
 
 
 def sqlite_url(tmp_path) -> str:
@@ -37,8 +38,12 @@ def test_migrations_match_the_models(tmp_path):
 def test_old_database_without_alembic_is_kept(tmp_path):
     """A database made with create_all (before Alembic) keeps its data."""
     url = sqlite_url(tmp_path)
+    # Build the tables exactly as they were before Alembic (= version 0001),
+    # then remove Alembic's own table, like on the first deploy
+    command.upgrade(alembic_config(url), INITIAL_REVISION)
     engine = create_engine(url)
-    Base.metadata.create_all(engine)
+    with engine.begin() as connection:
+        connection.execute(text("drop table alembic_version"))
     with engine.begin() as connection:
         connection.execute(text(
             "insert into users (email, password_hash, name, created_at) "
@@ -53,6 +58,10 @@ def test_old_database_without_alembic_is_kept(tmp_path):
         emails = connection.execute(text("select email from users")).scalars().all()
     engine.dispose()
     assert emails == ["old@example.com"]
+    # The old database got all the new tables too
+    engine = create_engine(url)
+    assert "recurring_payments" in inspect(engine).get_table_names()
+    engine.dispose()
     assert current_revision(url) is not None
 
 

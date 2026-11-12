@@ -28,6 +28,11 @@ class Transaction(Base):
     note: Mapped[str] = mapped_column(String(200), default="")
     # "Wanted it" instead of "needed it" - only for expenses
     is_impulsive: Mapped[bool] = mapped_column(default=False)
+    # Set when the server created this expense from a regular payment
+    recurring_payment_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recurring_payments.id", name="fk_transactions_recurring_payment_id"),
+        default=None,
+    )
     created_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: dt.datetime.now(dt.timezone.utc)
     )

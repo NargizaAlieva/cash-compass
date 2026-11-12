@@ -8,6 +8,7 @@ from app.models.account import Account
 from app.models.transaction import Transaction
 from app.models.user import User
 from app.schemas.stipend import StipendAllowance
+from app.services.recurring import reserved_before
 
 
 def _day_in_month(year: int, month: int, day: int) -> date:
@@ -49,7 +50,8 @@ def stipend_allowance(db: Session, user: User, today: date | None = None) -> Sti
     # This way the daily number stays the same during the day,
     # and "left today" goes down with every purchase.
     money_this_morning = balance + spent_today
-    daily = max(money_this_morning, 0) / days_left
+    reserved = reserved_before(db, user.id, next_date)
+    daily = max(money_this_morning - reserved, 0) / days_left
 
     return StipendAllowance(
         configured=True,
@@ -57,6 +59,7 @@ def stipend_allowance(db: Session, user: User, today: date | None = None) -> Sti
         next_stipend_date=next_date,
         days_left=days_left,
         balance=balance,
+        reserved_for_payments=reserved,
         daily_allowance=round(daily, 2),
         spent_today=spent_today,
         left_today=round(daily - spent_today, 2),

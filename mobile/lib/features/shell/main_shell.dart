@@ -11,6 +11,8 @@ import 'package:cash_compass/features/categories/data/categories_repository.dart
 import 'package:cash_compass/features/categories/ui/categories_screen.dart';
 import 'package:cash_compass/features/home/ui/home_screen.dart';
 import 'package:cash_compass/features/profile/ui/profile_screen.dart';
+import 'package:cash_compass/features/recurring/bloc/recurring_bloc.dart';
+import 'package:cash_compass/features/recurring/data/recurring_repository.dart';
 import 'package:cash_compass/features/stipend/bloc/stipend_bloc.dart';
 import 'package:cash_compass/features/stipend/data/stipend_repository.dart';
 import 'package:cash_compass/features/transactions/bloc/transactions_bloc.dart';
@@ -69,6 +71,11 @@ class _MainShellState extends State<MainShell> {
               StipendBloc(context.read<StipendRepository>())
                 ..add(const StipendRequested()),
         ),
+        BlocProvider(
+          create: (context) =>
+              RecurringBloc(context.read<RecurringRepository>())
+                ..add(const RecurringRequested()),
+        ),
       ],
       // Here the Blocs "talk" to each other. They do not know about
       // each other: these listeners connect them.
@@ -93,6 +100,19 @@ class _MainShellState extends State<MainShell> {
                 previous.user?.stipendDay != current.user?.stipendDay,
             listener: (context, state) =>
                 context.read<StipendBloc>().add(const StipendRequested()),
+          ),
+          // A regular payment changed. If it was due today, the server
+          // already created the expense, so everything with money reloads.
+          BlocListener<RecurringBloc, RecurringState>(
+            listenWhen: (previous, current) =>
+                previous.changeCount != current.changeCount,
+            listener: (context, state) {
+              context.read<TransactionsBloc>().add(const TransactionsRequested());
+              context.read<AccountsBloc>().add(const AccountsRequested());
+              context.read<BudgetsBloc>().add(const BudgetsRequested());
+              context.read<AnalyticsBloc>().add(const AnalyticsRequested());
+              context.read<StipendBloc>().add(const StipendRequested());
+            },
           ),
           // A category was deleted -> the server also deleted its limit
           BlocListener<CategoriesBloc, CategoriesState>(

@@ -199,6 +199,19 @@ def main():
     for category, limit in [("Food", 20000), ("Entertainment", 8000), ("Transport", 10000)]:
         api.call("PUT", f"/budgets/{cats[category]}", {"limit_amount": limit})
 
+    # Regular payments: from now on the server adds them every month by itself.
+    # The first charge is today or later, so there are no duplicates
+    # with the history below (it ends yesterday).
+    for name, amount, account, category, day in [
+        ("Dormitory", 15000, "Kaspi Gold", "Housing", 1),
+        ("Spotify", 1990, "Halyk", "Subscriptions", 3),
+        ("YouTube Premium", 1490, "Halyk", "Subscriptions", 12),
+    ]:
+        api.call("POST", "/recurring", {
+            "name": name, "amount": amount, "account_id": accounts[account],
+            "category_id": cats[category], "day_of_month": day,
+        })
+
     transactions = build_transactions(date.today(), accounts, cats)
     for number, transaction in enumerate(transactions, start=1):
         api.call("POST", "/transactions", transaction)

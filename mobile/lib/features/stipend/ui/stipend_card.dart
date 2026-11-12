@@ -99,6 +99,15 @@ class _AllowanceCard extends StatelessWidget {
                 '${formatMoney(daily.roundToDouble())} for today',
                 style: theme.textTheme.bodySmall,
               ),
+              // Money put aside for rent, subscriptions, ... before the stipend
+              if ((allowance.reservedForPayments ?? 0) > 0) ...[
+                const SizedBox(height: 4),
+                Text(
+                  '${formatMoney(allowance.reservedForPayments!)} '
+                  'kept for regular payments',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
               const SizedBox(height: 12),
               Row(
                 children: [

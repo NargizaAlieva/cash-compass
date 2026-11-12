@@ -17,6 +17,7 @@ class Transaction extends Equatable {
     this.categoryId,
     this.note = '',
     this.isImpulsive = false,
+    this.recurringPaymentId,
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) => Transaction(
@@ -29,6 +30,7 @@ class Transaction extends Equatable {
         date: DateTime.parse(json['date'] as String),
         note: json['note'] as String,
         isImpulsive: json['is_impulsive'] as bool,
+        recurringPaymentId: json['recurring_payment_id'] as int?,
       );
 
   final int id;
@@ -47,6 +49,9 @@ class Transaction extends Equatable {
   final String note;
   final bool isImpulsive;
 
+  /// Set when the server created this expense from a regular payment.
+  final int? recurringPaymentId;
+
   @override
   List<Object?> get props => [
         id,
@@ -58,6 +63,7 @@ class Transaction extends Equatable {
         date,
         note,
         isImpulsive,
+        recurringPaymentId,
       ];
 }
 

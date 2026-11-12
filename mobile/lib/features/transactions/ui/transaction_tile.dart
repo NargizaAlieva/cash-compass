@@ -70,6 +70,14 @@ class TransactionTile extends StatelessWidget {
       title: Row(
         children: [
           Flexible(child: Text(title, overflow: TextOverflow.ellipsis)),
+          if (transaction.recurringPaymentId != null)
+            const Padding(
+              padding: EdgeInsets.only(left: 4),
+              child: Tooltip(
+                message: 'Regular payment',
+                child: Icon(Icons.repeat, size: 16),
+              ),
+            ),
           if (transaction.isImpulsive)
             const Padding(
               padding: EdgeInsets.only(left: 4),
