@@ -7,9 +7,25 @@ import 'package:cash_compass/features/transactions/ui/transaction_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cash_compass/features/budgets/ui/budget_alerts_card.dart';
+import 'package:cash_compass/features/accounts/ui/accounts_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  
+  /// Accounts open as a separate screen. The new screen is outside
+  /// MainShell, so we pass the existing AccountsBloc to it.
+  void _openAccounts(BuildContext context) {
+    final accountsBloc = context.read<AccountsBloc>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: accountsBloc,
+          child: const AccountsScreen(),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +48,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           Text('Hello, ${name ?? ''}!', style: theme.textTheme.headlineSmall),
           const SizedBox(height: 16),
-                    TotalBalanceCard(total: total),
+                    TotalBalanceCard(total: total, onTap: () => _openAccounts(context)),
           const SizedBox(height: 8),
           // Shows nothing when all limits are fine
           const BudgetAlertsCard(),
