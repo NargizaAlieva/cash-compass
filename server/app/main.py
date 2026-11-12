@@ -3,13 +3,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.database import Base, engine
+from app.core.migrations import run_migrations
 from app.routers import accounts, analytics, auth, budgets, categories, stipend, transactions
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables on startup (Alembic migrations will replace this later)
-    Base.metadata.create_all(bind=engine)
+    # Create or update the tables to the newest version (see alembic/versions)
+    run_migrations()
     yield
 
 
