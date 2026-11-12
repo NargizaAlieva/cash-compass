@@ -1,10 +1,13 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-psycopg[binary]
-pydantic-settings
-email-validator
-pyjwt
-bcrypt
-pytest
-httpx
+# Exact versions, so the server on Render installs the same packages
+# that were tested. Update them on purpose, not by accident.
+fastapi==0.162.5
+uvicorn[standard]==0.54.0
+sqlalchemy==2.1.8
+alembic==1.20.1
+psycopg[binary]==3.3.9
+pydantic-settings==2.16.2
+email-validator==2.3.0
+pyjwt==2.15.1
+bcrypt==5.0.0
+pytest==9.2.0
+httpx==0.28.1
