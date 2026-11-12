@@ -13,6 +13,9 @@ class StipendAllowance(BaseModel):
     next_stipend_date: Date | None = None
     days_left: int | None = None  # today is counted, the stipend day is not
     balance: float | None = None  # money on all accounts now
+    # Regular payments (rent, subscriptions) that come before the stipend.
+    # This money is put aside and not counted in the daily budget.
+    reserved_for_payments: float | None = None
     daily_allowance: float | None = None  # what can be spent each day
     spent_today: float | None = None
     left_today: float | None = None  # negative = spent more than allowed today

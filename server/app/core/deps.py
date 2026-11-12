@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.models.user import User
+from app.services.recurring import process_due_payments
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -26,4 +27,8 @@ def get_current_user(
     user = db.get(User, user_id) if user_id is not None else None
     if user is None:
         raise unauthorized
+
+    # Regular payments that became due are turned into expenses here,
+    # so every screen of the app already sees them
+    process_due_payments(db, user.id)
     return user

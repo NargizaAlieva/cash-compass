@@ -4,6 +4,7 @@ import 'package:cash_compass/core/storage/token_storage.dart';
 import 'package:cash_compass/features/accounts/data/accounts_repository.dart';
 import 'package:cash_compass/features/auth/data/auth_repository.dart';
 import 'package:cash_compass/features/categories/data/categories_repository.dart';
+import 'package:cash_compass/features/recurring/data/recurring_repository.dart';
 import 'package:cash_compass/features/transactions/data/transactions_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
@@ -25,6 +26,7 @@ void main() {
       budgetsRepository: BudgetsRepository(apiClient),
       analyticsRepository: AnalyticsRepository(apiClient),
       stipendRepository: StipendRepository(apiClient),
+      recurringRepository: RecurringRepository(apiClient),
     ),
   );
 }

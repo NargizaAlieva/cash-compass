@@ -50,3 +50,4 @@ class TransactionOut(BaseModel):
     date: Date
     note: str
     is_impulsive: bool
+    recurring_payment_id: int | None  # created from a regular payment

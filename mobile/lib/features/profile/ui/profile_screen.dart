@@ -1,6 +1,7 @@
 import 'package:cash_compass/core/ui/confirm_dialog.dart';
 import 'package:cash_compass/core/ui/formatters.dart';
 import 'package:cash_compass/features/auth/bloc/auth_bloc.dart';
+import 'package:cash_compass/features/recurring/ui/recurring_screen.dart';
 import 'package:cash_compass/features/stipend/ui/stipend_settings_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,6 +62,13 @@ class ProfileScreen extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => editStipendSettings(context),
+            ),
+            ListTile(
+              leading: const Icon(Icons.repeat),
+              title: const Text('Regular payments'),
+              subtitle: const Text('Rent, subscriptions, phone...'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => openRecurringScreen(context),
             ),
             const Divider(),
             ListTile(

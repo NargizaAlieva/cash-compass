@@ -11,6 +11,7 @@ class StipendAllowance extends Equatable {
     this.nextStipendDate,
     this.daysLeft,
     this.balance,
+    this.reservedForPayments,
     this.dailyAllowance,
     this.spentToday,
     this.leftToday,
@@ -24,6 +25,7 @@ class StipendAllowance extends Equatable {
       nextStipendDate: next == null ? null : DateTime.parse(next),
       daysLeft: json['days_left'] as int?,
       balance: _toDouble(json['balance']),
+      reservedForPayments: _toDouble(json['reserved_for_payments']),
       dailyAllowance: _toDouble(json['daily_allowance']),
       spentToday: _toDouble(json['spent_today']),
       leftToday: _toDouble(json['left_today']),
@@ -37,6 +39,9 @@ class StipendAllowance extends Equatable {
   /// Today is counted, the stipend day is not.
   final int? daysLeft;
   final double? balance;
+
+  /// Regular payments before the stipend. Not counted in the daily budget.
+  final double? reservedForPayments;
 
   /// What can be spent each day until the stipend.
   final double? dailyAllowance;
@@ -52,6 +57,7 @@ class StipendAllowance extends Equatable {
         nextStipendDate,
         daysLeft,
         balance,
+        reservedForPayments,
         dailyAllowance,
         spentToday,
         leftToday,
