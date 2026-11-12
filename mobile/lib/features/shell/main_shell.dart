@@ -1,6 +1,8 @@
 import 'package:cash_compass/features/accounts/bloc/accounts_bloc.dart';
 import 'package:cash_compass/features/accounts/data/accounts_repository.dart';
-import 'package:cash_compass/features/accounts/ui/accounts_screen.dart';
+import 'package:cash_compass/features/analytics/bloc/analytics_bloc.dart';
+import 'package:cash_compass/features/analytics/data/analytics_repository.dart';
+import 'package:cash_compass/features/analytics/ui/analytics_screen.dart';
 import 'package:cash_compass/features/budgets/bloc/budgets_bloc.dart';
 import 'package:cash_compass/features/budgets/data/budgets_repository.dart';
 import 'package:cash_compass/features/categories/bloc/categories_bloc.dart';
@@ -53,18 +55,26 @@ class _MainShellState extends State<MainShell> {
               BudgetsBloc(context.read<BudgetsRepository>())
                 ..add(const BudgetsRequested()),
         ),
+        // NEW: analytics for the selected month
+        BlocProvider(
+          create: (context) =>
+              AnalyticsBloc(context.read<AnalyticsRepository>())
+                ..add(const AnalyticsRequested()),
+        ),
       ],
       // Here the Blocs "talk" to each other. They do not know about
       // each other: these listeners connect them.
       child: MultiBlocListener(
         listeners: [
-          // A transaction changed -> balances and spent amounts changed too
+          // A transaction changed -> balances, limits and analytics changed
           BlocListener<TransactionsBloc, TransactionsState>(
             listenWhen: (previous, current) =>
                 previous.changeCount != current.changeCount,
             listener: (context, state) {
               context.read<AccountsBloc>().add(const AccountsRequested());
               context.read<BudgetsBloc>().add(const BudgetsRequested());
+              // NEW: charts must show the new transaction too
+              context.read<AnalyticsBloc>().add(const AnalyticsRequested());
             },
           ),
           // A category was deleted -> the server also deleted its limit
@@ -93,7 +103,7 @@ class _MainShellState extends State<MainShell> {
             children: const [
               HomeScreen(),
               TransactionsScreen(),
-              AccountsScreen(),
+              AnalyticsScreen(), // NEW: instead of AccountsScreen
               CategoriesScreen(),
               ProfileScreen(),
             ],
@@ -112,10 +122,11 @@ class _MainShellState extends State<MainShell> {
                 selectedIcon: Icon(Icons.receipt_long),
                 label: 'History',
               ),
+              // NEW: instead of the Accounts tab
               NavigationDestination(
-                icon: Icon(Icons.account_balance_wallet_outlined),
-                selectedIcon: Icon(Icons.account_balance_wallet),
-                label: 'Accounts',
+                icon: Icon(Icons.pie_chart_outline),
+                selectedIcon: Icon(Icons.pie_chart),
+                label: 'Analytics',
               ),
               NavigationDestination(
                 icon: Icon(Icons.category_outlined),

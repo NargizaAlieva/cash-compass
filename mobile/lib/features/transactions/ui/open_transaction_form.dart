@@ -20,8 +20,7 @@ Future<void> openTransactionForm(
 
   if (accounts.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add an account first (Accounts tab)')),
-    );
+      const SnackBar(content: Text('Add an account first: tap the balance card on Home')),    );
     return;
   }
 
