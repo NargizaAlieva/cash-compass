@@ -1,0 +1,27 @@
+# Render Blueprint: one file describes the server and the database.
+# Render reads it when you create a "Blueprint" from this repository.
+services:
+  - type: web
+    name: cash-compass-api
+    runtime: python
+    plan: free
+    rootDir: server
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.5"
+      # Render creates a long random secret for the JWT tokens
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cash-compass-db
+          property: connectionString
+
+databases:
+  - name: cash-compass-db
+    plan: free
+    databaseName: cash_compass
+    user: cash_compass
